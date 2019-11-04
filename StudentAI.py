@@ -7,7 +7,7 @@ import math
 #Students can modify anything except the class name and exisiting functions and varibles.
 class StudentAI():
 
-    SEARCH_DEPTH = 1
+    SEARCH_DEPTH = 4
 
     def __init__(self,col,row,p):
         self.col = col
@@ -18,6 +18,7 @@ class StudentAI():
         self.color = ''
         self.opponent = {1:2,2:1}
         self.color = 2
+
     def get_move(self,move):
         if len(move) != 0:
             self.board.make_move(move,self.opponent[self.color])
@@ -28,11 +29,14 @@ class StudentAI():
         # index = randint(0,len(moves)-1)
         # inner_index =  randint(0,len(moves[index])-1)
         # move = moves[index][inner_index]
+
         best_move = None
         best_move_score = -math.inf
         for outer_index in range(len(moves)):
             for inner_index in range(len(moves[outer_index])):
-                move_score = self.search(StudentAI.SEARCH_DEPTH, moves[outer_index][inner_index], self.color)
+                self.board.make_move(moves[outer_index][inner_index], self.color)
+                move_score = self.search(StudentAI.SEARCH_DEPTH, moves[outer_index][inner_index], self.opponent[self.color])
+                self.board.undo()
                 if move_score > best_move_score:
                     best_move_score = move_score
                     best_move = moves[outer_index][inner_index]
@@ -42,11 +46,8 @@ class StudentAI():
 
 
     def search(self, depth, move, turn):
-        self.board.make_move(move, turn)
-
         if depth == 0:
             score = self.board.black_count - self.board.white_count
-            self.board.undo()
             if turn == self.color:
                 if self.color == 1:   #1 = black
                     return score
@@ -62,6 +63,7 @@ class StudentAI():
             possible_moves = self.board.get_all_possible_moves(self.color)
             for x in range(len(possible_moves)):
                 for y in range(len(possible_moves[x])):
+                    self.board.make_move(possible_moves[x][y], self.color)
                     current = self.search(depth-1, possible_moves[x][y], self.opponent[self.color])
                     self.board.undo()
                     if current > best:
@@ -73,8 +75,9 @@ class StudentAI():
             possible_moves = self.board.get_all_possible_moves(self.opponent[self.color])
             for x in range(len(possible_moves)):
                 for y in range(len(possible_moves[x])):
+                    self.board.make_move(possible_moves[x][y], self.opponent[self.color])
                     current = self.search(depth-1, possible_moves[x][y], self.color)
                     self.board.undo()
                     if current < worst:
                         worst = current
-            return worst
+            return worst    
