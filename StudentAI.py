@@ -46,6 +46,20 @@ class StudentAI():
 
 
     def search(self, depth, move, turn):
+        
+        if self.board.is_win(turn)==1:
+            if self.color == 1:
+                return math.inf
+            else:
+                return -math.inf
+        
+        elif self.board.is_win(turn)==2:
+            if self.color == 2:
+                return math.inf
+            else:
+                return -math.inf
+
+
         if depth == 0:
             score = self.board.black_count - self.board.white_count
             if turn == self.color:
