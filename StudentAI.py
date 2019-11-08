@@ -7,8 +7,6 @@ import math
 #Students can modify anything except the class name and exisiting functions and varibles.
 class StudentAI():
 
-    SEARCH_DEPTH = 2
-
     def __init__(self,col,row,p):
         self.col = col
         self.row = row
@@ -18,6 +16,8 @@ class StudentAI():
         self.color = ''
         self.opponent = {1:2,2:1}
         self.color = 2
+
+        self.search_depth = 3
 
     def get_move(self,move):
         if len(move) != 0:
@@ -35,9 +35,8 @@ class StudentAI():
         for outer_index in range(len(moves)):
             for inner_index in range(len(moves[outer_index])):
                 self.board.make_move(moves[outer_index][inner_index], self.color)
-                move_score = self.search(StudentAI.SEARCH_DEPTH, moves[outer_index][inner_index], self.color)
+                move_score = self.search(self.search_depth, moves[outer_index][inner_index], self.color)
                 self.board.undo()
-                print(str(outer_index) + " " + str(inner_index) + " :" + str(move_score))
                 if move_score > best_move_score:
                     best_move_score = move_score
                     best_move = moves[outer_index][inner_index]
@@ -48,54 +47,42 @@ class StudentAI():
 
     def search(self, depth, move, turn):
 
-        score = self.board.black_count - self.board.white_count
-
-        if self.board.is_win(turn)==1:
-            if self.color == 1:
-                return score
-            else:
-                return -score
+        winner = self.board.is_win(turn)
+        if winner != 0:
+            if winner == -1:
+                return 0
+            if self.color == winner:
+                return math.inf
+            return -math.inf
         
-        elif self.board.is_win(turn)==2:
-            if self.color == 2:
-                return -score
-            else:
-                return score
-
-        elif self.board.is_win(turn)==-1:
-            return 0
-
         if depth == 0:
-            if turn == self.color:
-                if self.color == 1:   #1 = black
-                    return score
-                return -score         #2 = white
-            else:
-                if self.color == 1:
-                    return -score
+            score = self.board.black_count - self.board.white_count
+            if self.color == 1:   #1 = black
                 return score
+            return -score         #2 = white
 
 
-        if turn == self.color:   #max
-            best = -math.inf
-            possible_moves = self.board.get_all_possible_moves(self.color)
-            for x in range(len(possible_moves)):
-                for y in range(len(possible_moves[x])):
-                    self.board.make_move(possible_moves[x][y], self.color)
-                    current = self.search(depth-1, possible_moves[x][y], self.opponent[self.color])
-                    self.board.undo()
-                    if current > best:
-                        best = current
-            return best
-
-        else:                    #min
+        if turn == self.color:   #min
             worst = math.inf
             possible_moves = self.board.get_all_possible_moves(self.opponent[self.color])
             for x in range(len(possible_moves)):
                 for y in range(len(possible_moves[x])):
                     self.board.make_move(possible_moves[x][y], self.opponent[self.color])
-                    current = self.search(depth-1, possible_moves[x][y], self.color)
+                    current = self.search(depth-1, possible_moves[x][y], self.opponent[self.color])
                     self.board.undo()
                     if current < worst:
                         worst = current
-            return worst    
+            return worst   
+            
+
+        else:                    #max
+            best = -math.inf
+            possible_moves = self.board.get_all_possible_moves(self.color)
+            for x in range(len(possible_moves)):
+                for y in range(len(possible_moves[x])):
+                    self.board.make_move(possible_moves[x][y], self.color)
+                    current = self.search(depth-1, possible_moves[x][y], self.color)
+                    self.board.undo()
+                    if current > best:
+                        best = current
+            return best
