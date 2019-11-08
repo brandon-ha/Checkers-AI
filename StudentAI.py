@@ -7,7 +7,7 @@ import math
 #Students can modify anything except the class name and exisiting functions and varibles.
 class StudentAI():
 
-    SEARCH_DEPTH = 4
+    SEARCH_DEPTH = 2
 
     def __init__(self,col,row,p):
         self.col = col
@@ -35,8 +35,9 @@ class StudentAI():
         for outer_index in range(len(moves)):
             for inner_index in range(len(moves[outer_index])):
                 self.board.make_move(moves[outer_index][inner_index], self.color)
-                move_score = self.search(StudentAI.SEARCH_DEPTH, moves[outer_index][inner_index], self.opponent[self.color])
+                move_score = self.search(StudentAI.SEARCH_DEPTH, moves[outer_index][inner_index], self.color)
                 self.board.undo()
+                print(str(outer_index) + " " + str(inner_index) + " :" + str(move_score))
                 if move_score > best_move_score:
                     best_move_score = move_score
                     best_move = moves[outer_index][inner_index]
@@ -46,22 +47,25 @@ class StudentAI():
 
 
     def search(self, depth, move, turn):
-        
+
+        score = self.board.black_count - self.board.white_count
+
         if self.board.is_win(turn)==1:
             if self.color == 1:
-                return math.inf
+                return score
             else:
-                return -math.inf
+                return -score
         
         elif self.board.is_win(turn)==2:
             if self.color == 2:
-                return math.inf
+                return -score
             else:
-                return -math.inf
+                return score
 
+        elif self.board.is_win(turn)==-1:
+            return 0
 
         if depth == 0:
-            score = self.board.black_count - self.board.white_count
             if turn == self.color:
                 if self.color == 1:   #1 = black
                     return score
