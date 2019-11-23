@@ -19,7 +19,7 @@ class StudentAI():
         self.opponent = {1: 2, 2: 1}
         self.color = 2
 
-        self.search_depth = 5
+        self.search_depth = 4
 
     def get_move(self, move):
         if len(move) != 0:
@@ -50,14 +50,27 @@ class StudentAI():
 
     def search(self, depth, move, turn, alpha, beta):
         winner = self.board.is_win(turn)
+        win_return = 1000 + depth
         if winner != 0:
             if winner == -1:
                 return 0
             if self.color == winner:
-                return math.inf
-            return -math.inf
+                return win_return
+            return -win_return
         if depth == 0:
-            score = self.board.black_count - self.board.white_count
+            black = 0
+            white = 0
+            for x in range(self.board.row):
+                for y in range(self.board.col):
+                    if self.board.board[x][y].color=="W":
+                        white+=1
+                        if self.board.board[x][y].is_king:
+                            white +=1
+                    if self.board.board[x][y].color=="B":
+                        black+=1
+                        if self.board.board[x][y].is_king:
+                            black +=1
+            score = black - white
             if self.color == 1:  # 1 = black
                 return score
             return -score  # 2 = white
