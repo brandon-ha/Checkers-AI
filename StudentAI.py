@@ -65,11 +65,11 @@ class StudentAI():
                     if self.board.board[x][y].color=="W":
                         white+=1
                         if self.board.board[x][y].is_king:
-                            white +=1
+                            white +=4
                     if self.board.board[x][y].color=="B":
                         black+=1
                         if self.board.board[x][y].is_king:
-                            black +=1
+                            black +=4
             score = black - white
             if self.color == 1:  # 1 = black
                 return score
