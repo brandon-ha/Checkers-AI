@@ -32,14 +32,17 @@ class StudentAI():
         # inner_index =  randint(0,len(moves[index])-1)
         # move = moves[index][inner_index]
 
+        how_many_moves = 0
+        for outer_index in range(len(moves)):
+            how_many_moves += len(moves[outer_index])
+
+        depth = round((1/how_many_moves) + self.search_depth)
         best_move = None
         best_move_score = -math.inf
         for outer_index in range(len(moves)):
             for inner_index in range(len(moves[outer_index])):
-                self.board.make_move(
-                    moves[outer_index][inner_index], self.color)
-                move_score = self.search(
-                    self.search_depth, moves[outer_index][inner_index], self.color, -math.inf, math.inf)
+                self.board.make_move(moves[outer_index][inner_index], self.color)
+                move_score = self.search(depth, moves[outer_index][inner_index], self.color, -math.inf, math.inf)
                 self.board.undo()
                 if move_score > best_move_score:
                     best_move_score = move_score
