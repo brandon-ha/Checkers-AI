@@ -3,6 +3,7 @@ from BoardClasses import Move
 from BoardClasses import Board
 
 import math
+import time
 # The following part should be completed by students.
 # Students can modify anything except the class name and exisiting functions and varibles.
 
@@ -20,8 +21,13 @@ class StudentAI():
         self.color = 2
 
         self.search_depth = 4
+        self.debug = True
+        self.time_used = 0
 
     def get_move(self, move):
+        if self.debug:
+            current_move_elapsed = time.time()
+
         if len(move) != 0:
             self.board.make_move(move, self.opponent[self.color])
         else:
@@ -36,7 +42,12 @@ class StudentAI():
         for outer_index in range(len(moves)):
             how_many_moves += len(moves[outer_index])
 
-        depth = round((1/how_many_moves) + self.search_depth)
+        depth = round((4/how_many_moves) + self.search_depth)
+
+        if self.debug:
+            print(how_many_moves, "possible moves")
+            print("Depth:", depth)
+
         best_move = None
         best_move_score = -math.inf
         for outer_index in range(len(moves)):
@@ -49,6 +60,11 @@ class StudentAI():
                     best_move = moves[outer_index][inner_index]
 
         self.board.make_move(best_move, self.color)
+
+        if self.debug:
+            self.time_used += (time.time() - current_move_elapsed)
+            print("Total elapsed time (in seconds):", self.time_used)
+
         return best_move
 
     def search(self, depth, move, turn, alpha, beta):
@@ -66,13 +82,19 @@ class StudentAI():
             for x in range(self.board.row):
                 for y in range(self.board.col):
                     if self.board.board[x][y].color=="W":
-                        white+=1
+                        white += 5
                         if self.board.board[x][y].is_king:
-                            white +=4
+                            white += self.row + 2
+                        else:
+                            white += x
+
                     if self.board.board[x][y].color=="B":
-                        black+=1
+                        black += 5
                         if self.board.board[x][y].is_king:
-                            black +=4
+                            black += self.row + 2
+                        else:
+                            black += (self.row - x - 1)
+
             score = black - white
             if self.color == 1:  # 1 = black
                 return score
