@@ -20,7 +20,7 @@ class StudentAI():
         self.opponent = {1: 2, 2: 1}
         self.color = 2
 
-        self.search_depth = 4
+        self.search_depth = 6
         self.debug = True
         self.time_used = 0
 
@@ -58,6 +58,11 @@ class StudentAI():
                 if move_score > best_move_score:
                     best_move_score = move_score
                     best_move = moves[outer_index][inner_index]
+                    if best_move_score == 1000 + depth:
+                        break
+            else:
+                continue
+            break
 
         self.board.make_move(best_move, self.color)
 
