@@ -58,11 +58,6 @@ class StudentAI():
                 if move_score > best_move_score:
                     best_move_score = move_score
                     best_move = moves[outer_index][inner_index]
-                    if best_move_score == 1000 + depth:
-                        break
-            else:
-                continue
-            break
 
         self.board.make_move(best_move, self.color)
 
