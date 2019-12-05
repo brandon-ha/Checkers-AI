@@ -46,6 +46,10 @@ class StudentAI():
             how_many_moves += len(moves[outer_index])
 
         if how_many_moves == 1:
+            if self.debug:
+                self.time_used += (time.time() - current_move_elapsed)
+                print("Total elapsed time (in seconds):", self.time_used)
+            self.board.make_move(moves[0][0], self.color)
             return moves[0][0]
 
         depth = round((4/how_many_moves) + self.search_depth)
