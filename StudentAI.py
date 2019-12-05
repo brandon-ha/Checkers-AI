@@ -21,7 +21,7 @@ class StudentAI():
         self.opponent = {1: 2, 2: 1}
         self.color = 2
 
-        self.search_depth = 4
+        self.search_depth = 5
         self.debug = True
         self.time_used = 0
         
@@ -44,6 +44,9 @@ class StudentAI():
         how_many_moves = 0
         for outer_index in range(len(moves)):
             how_many_moves += len(moves[outer_index])
+
+        if how_many_moves == 1:
+            return moves[0][0]
 
         depth = round((4/how_many_moves) + self.search_depth)
 
