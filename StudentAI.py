@@ -4,6 +4,7 @@ from BoardClasses import Board
 
 import math
 import time
+
 # The following part should be completed by students.
 # Students can modify anything except the class name and exisiting functions and varibles.
 
@@ -20,9 +21,11 @@ class StudentAI():
         self.opponent = {1: 2, 2: 1}
         self.color = 2
 
-        self.search_depth = 6
+        self.search_depth = 5
         self.debug = True
         self.time_used = 0
+        
+        self.transposition_table = dict()
 
     def get_move(self, move):
         if self.debug:
@@ -41,6 +44,9 @@ class StudentAI():
         how_many_moves = 0
         for outer_index in range(len(moves)):
             how_many_moves += len(moves[outer_index])
+
+        if how_many_moves == 1:
+            return moves[0][0]
 
         depth = round((4/how_many_moves) + self.search_depth)
 
@@ -68,13 +74,20 @@ class StudentAI():
         return best_move
 
     def search(self, depth, move, turn, alpha, beta):
+        current_key = self.get_key()
+        if current_key in self.transposition_table.keys() and depth == self.transposition_table[current_key].depth:
+            return self.transposition_table[current_key].value
+
         winner = self.board.is_win(turn)
         win_return = 1000 + depth
         if winner != 0:
             if winner == -1:
+                self.transposition_table[current_key] = TTEntry(0, depth)
                 return 0
             if self.color == winner:
+                self.transposition_table[current_key] = TTEntry(win_return, depth)
                 return win_return
+            self.transposition_table[current_key] = TTEntry(-win_return, depth)
             return -win_return
         if depth == 0:
             black = 0
@@ -97,7 +110,9 @@ class StudentAI():
 
             score = black - white
             if self.color == 1:  # 1 = black
+                self.transposition_table[current_key] = TTEntry(score, depth)
                 return score
+            self.transposition_table[current_key] = TTEntry(-score, depth)
             return -score  # 2 = white
 
         if turn == self.color:  # min
@@ -120,6 +135,7 @@ class StudentAI():
                 else:
                     continue
                 break
+            self.transposition_table[current_key] = TTEntry(worst, depth)
             return worst
 
         else:  # max
@@ -140,4 +156,23 @@ class StudentAI():
                 else:
                     continue
                 break
+            self.transposition_table[current_key] = TTEntry(best, depth)
             return best
+
+
+    def get_key(self):
+        key = ""
+        for x in range(self.board.row):
+            for y in range(self.board.col):
+                if self.board.board[x][y].color=="B":
+                    key += "1"
+                elif self.board.board[x][y].color=="W":
+                    key += "2"
+                else:
+                    key += "0"
+        return key
+
+class TTEntry:
+    def __init__(self, value, depth):
+        self.value = value
+        self.depth = depth
